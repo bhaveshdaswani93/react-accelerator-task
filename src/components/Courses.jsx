@@ -8,15 +8,27 @@ class Courses extends Component {
         super();
        // console.log('constructor')
         this.state = {
-            courses : [],
-            pageSize : 2
+            courses:         [],
+            currentPage:     1,
+            currentPageData: [],
+            pageSize:        2,
         }
     }
 
     componentDidMount(){
        // console.log('componentDidMount()')
+        const { currentPage, pageSize } = this.state;
         const courses = getCourses();
-        this.setState({  courses  })
+        
+        const currentPageData = this.getCurrentPageData(courses, currentPage, pageSize);
+        this.setState({  courses, currentPageData  });
+    }
+
+    getCurrentPageData(courses, currentPage, pageSize) {
+        const start = (currentPage - 1) * pageSize;
+        const end = (currentPage) * pageSize;
+        const currentPageData = courses.slice(start, end);
+        return currentPageData;
     }
 
     handleRemove = (courseId) => {
@@ -25,11 +37,17 @@ class Courses extends Component {
         this.setState({courses})
     }
 
+    handlePagination = (pageNumber) => {
+        const { courses, pageSize } = this.state;
+        const currentPageData = this.getCurrentPageData(courses, pageNumber, pageSize);
+        this.setState({ currentPage: pageNumber, currentPageData });
+    }
+
     render() {
         //console.log('render()')
 
-        const { courses, pageSize } = this.state;
-        const { length:count } = courses;
+        const { courses, pageSize, currentPageData, currentPage } = this.state;
+        const { length: count } = courses;
 
         if(count===0)
             return <p>No Courses yet!..</p>
@@ -53,7 +71,7 @@ class Courses extends Component {
                     </thead>
                     <tbody>
                         {
-                            courses.map( course => (
+                            currentPageData.map( course => (
                                    <tr key={course._id}>
                                        <td>{course.title}</td>
                                        <td>{course.category.name}</td>
@@ -74,7 +92,10 @@ class Courses extends Component {
 
                 <Pagination
                     itemsCount={count}
-                    pageSize={pageSize} />
+                    pageSize={pageSize} 
+                    onPageChange={this.handlePagination}
+                    currentPage={currentPage}
+                />
 
             </div>
         );
