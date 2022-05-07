@@ -6,11 +6,20 @@ const Pagination = ({ itemsCount, pageSize, onPageChange, currentPage }) => {
 
     const pageCount = Math.ceil(itemsCount / pageSize);    
     const pages = _.range(1, pageCount+1);
+    const handlePrevious = () => {
+        if (currentPage != 1)
+            onPageChange(currentPage - 1)
+    };
+
+    const handleNext = () => {
+        if (currentPage < pages.length)
+            onPageChange(currentPage + 1)
+    };
 
     return (
         <nav>
             <ul className="pagination">
-                <li className="page-item"><a className="page-link" href="#">Previous</a></li>
+                <li disabled onClick={handlePrevious} className={`page-item ${currentPage == 1 ? 'disabled' : ''}`}><a className="page-link" href="#">Previous</a></li>
                 
                 {
                     pages.map( page => (
@@ -21,7 +30,7 @@ const Pagination = ({ itemsCount, pageSize, onPageChange, currentPage }) => {
                 }
                 
                 
-                <li className="page-item"><a className="page-link" href="#">Next</a></li>
+                <li onClick={handleNext} className={`page-item ${currentPage == pages.length ? 'disabled' : ''}`}><a className="page-link" href="#">Next</a></li>
             </ul>
         </nav>
     );
